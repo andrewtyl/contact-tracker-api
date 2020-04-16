@@ -13,7 +13,7 @@
   ],
   "engines": {
     "node": "10.16.3",
-    "npm": "6.9.0"
+    "npm": "6.14.4"
   },
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
     "test": "mocha --require test/setup.js",
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "predeploy": "mocha --require test/setup.js ; npm audit"
+    "predeploy": "npm i --package-lock-only ; mocha --require test/setup.js ; npm audit"
   },
   "dependencies": {
     "aes256": "^1.0.4",
@@ -37,10 +37,10 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^3.22.0",
+    "heroku-ssl-redirect": "0.0.4",
     "knex": "^0.20.15",
     "morgan": "^1.10.0",
     "pg": "^8.0.2",
-    "ph": "^0.1.10",
     "randomstring": "^1.1.5"
   },
   "devDependencies": {
