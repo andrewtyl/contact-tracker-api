@@ -22,6 +22,11 @@ const encrypt = {
         console.log(hashedPass2)
         console.log(hashedPass)
         return (hashedPass === hashedPass2);
+    },
+
+    genSalt: () => {
+        const salt = bcrypt.genSaltSync(10)
+        return salt;
     }
 
 }

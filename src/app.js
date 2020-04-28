@@ -56,7 +56,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/hashTest', (req, res) => {
-    const password = "tempPass";
+    const password = "defaultPassword1!";
     if (password.length >= 8) {
         bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(password, salt, function (err, hashedPass) {
@@ -123,6 +123,13 @@ app.get('/genPassword', (req, res) => {
             errorMessage: knexRes
         })
     })
+})
+
+.get('/genSalt', (req, res) => {
+    let genSalt = encrypt.genSalt()
+    console.log(genSalt)
+    console.log(typeof genSalt)
+    return res.status(500).json({})
 })
 
 module.exports = app
