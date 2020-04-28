@@ -11,6 +11,7 @@ const aes256 = require("aes256");
 const { adminKey } = require("../config");
 let thisSessionKey = "";
 let currentUsername = "";
+let user_id = null;
 
 userRouter
   .all(jsonBodyParser, (req, res, next) => {
@@ -45,7 +46,7 @@ userRouter
       knexInstance
         .from("user_list")
         .where({ user_username: userAuth.username })
-        .select("user_salt", "user_password")
+        .select("user_salt", "user_password", "user_id")
         .then((kres) => {
           const userInfo = kres[0];
           if (userInfo === undefined) {
@@ -68,6 +69,7 @@ userRouter
                 adminKey + userkey,
                 "$2b$10$.Jryq1VpUrV5GE82OvmVTu"
               );
+              user_id = kres[0].user_id
               next();
             } else {
               return res
@@ -163,6 +165,32 @@ userRouter
     return res.status(500).json("In Development");
   })
   .post("/contact", jsonBodyParser, (req, res, next) => {
+      console.log(req.body)
+      let keys = Object.keys(req.body)
+      let values = Object.values(req.body)
+      for (let i=0; i < values.length; i++) {
+          if (values[i].length > 200) {
+              return res.status(400).json({
+                  error: "Overfill error",
+                  errorMessage: `The ${keys[i]} value is over 200 characters. Please shorten it and then retry your request.`
+              })
+          }
+      }
+      let knexPost = req.body;
+      knexPost.user_id = user_id;
+      knexInstance('contact_list').insert(knexPost).then( kres => {
+        return res.status(201).json(req.body)
+      }
+      ).catch(
+          kres => {
+              return res.status(500).json({
+                  error:"Knex Connection Failed",
+                  errorMessage: kres
+              })
+          }
+      )
+      
+
     return res.status(500).json("In Development");
   })
 

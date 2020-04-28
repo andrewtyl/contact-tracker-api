@@ -11,7 +11,6 @@ if (process.env.NODE_ENV !== 'production' && process.env.NODE_ENV !== undefined)
 else {
   knex_con_value = process.env.DATABASE_URL
 }
-console.log(knex_con_value)
 
 module.exports = {
   PORT: process.env.PORT || 8000,
