@@ -102,4 +102,27 @@ app.get('/saltTest', (req, res) => {
 
 })
 
+app.get('/genPassword', (req, res) => {
+    let p1 = new Promise((resolve, reject) => {
+        encrypt.createPassword(resolve, reject)
+    })
+    p1.then(encrypt_res => {
+        console.log(encrypt_res);
+        console.log(typeof encrypt_res)
+        res.status(500).json(encrypt_res)
+    })
+})
+
+.get('/knexTest', (req, res) => {
+    const knexInstance = req.app.get('knexInstance')
+    knexInstance.from('knex_test_table').timeout(1000, { cancel: true }).then(knexRes => {
+        return res.status(200).json("Knex connection working properly")
+    }).catch(knexRes => {
+        return res.status(500).json({
+            error: "Knex Connection Failed",
+            errorMessage: knexRes
+        })
+    })
+})
+
 module.exports = app

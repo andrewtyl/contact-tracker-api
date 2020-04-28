@@ -16,14 +16,23 @@ adminRouter
 
         if (!rawauth) {
             //no auth
+            res.status(403).json({
+                error: "No Auth Header",
+                errorMessage: "You are missing authentication information. Please use basic auth with your requests."
+            })
         }
         else if (!(rawauth.startsWith("Basic"))) {
             //not basic auth
+            res.status(404).json({
+                error: "Auth Header: Invalid Syntax",
+                errorMessage: "Auth headers should use Basic Authentication."
+            })
         }
         else {
             rawauth = rawauth.substr(6)
             rawauth = base64.decode(rawauth)
             const userAuth = { username: rawauth.split(':')[0], plainTextPass: rawauth.split(":")[1] }
+            console.log(userAuth)
             const knexInstance = req.app.get('knexInstance')
             knexInstance.from('user_list').where({ user_username: userAuth.username }).select("user_admin", "user_salt", "user_password").then(kres => {
                 const userInfo = kres[0]
