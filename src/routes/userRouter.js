@@ -65,10 +65,10 @@ userRouter
             if (passRight) {
               const userkey =
                 (userAuth.plainTextPass, userInfo.user_salt) + "0000";
-              thisSessionKey = encrypt.hashPassword(
+              thisSessionKey = (encrypt.hashPassword(
                 adminKey + userkey,
                 "$2b$10$.Jryq1VpUrV5GE82OvmVTu"
-              );
+              ).hashedPass);
               user_id = kres[0].user_id
               next();
             } else {
@@ -177,7 +177,13 @@ userRouter
           }
       }
       let knexPost = req.body;
+
+      Object.keys(knexPost).forEach(key => {
+          knexPost[key] = aes256.encrypt(thisSessionKey, knexPost[key])
+      })
       knexPost.user_id = user_id;
+      if (knexPost.key) {knexPost.key = aes256.encrypt(thisSessionKey, knexPost.key)}
+      const knexInstance = req.app.get("knexInstance");
       knexInstance('contact_list').insert(knexPost).then( kres => {
         return res.status(201).json(req.body)
       }
@@ -189,9 +195,6 @@ userRouter
               })
           }
       )
-      
-
-    return res.status(500).json("In Development");
   })
 
   .patch("/contact", jsonBodyParser, (req, res, next) => {

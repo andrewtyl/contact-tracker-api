@@ -6,6 +6,7 @@ const jsonBodyParser = express.json();
 const testRouter = express.Router();
 const bcrypt = require('bcrypt')
 const encrypt = require('../helpers/encrypt')
+const aes256 = require('aes256');
 
 testRouter
   .get("/", (req, res) => {
@@ -89,6 +90,14 @@ testRouter
     console.log(genSalt);
     console.log(typeof genSalt);
     return res.status(500).json({});
+  })
+  .get("/aesTest", (req, res) => {
+    const ares_encrypted = aes256.encrypt("yeet", "SD2moxEAM0pI565nLgBCyr5FIbDKAMbT71eVohYzWVAIIXaMYUB4ca3Mt6CWpBcA2v6sBF0izy8erjp114ACj8WOarA1GgCpJLVMgSftPlOIHysfpZYnDfMsdwuSbQLNwT0Ui1PVZcMnldPJk8PEklokFvieQ6J0N63tJlFEW0CxwhBK3gbsasqRakvwYe3oUEZmVrU8")
+    console.log(`ares_encrypted = ${ares_encrypted}`)
+    console.log(ares_encrypted.length)
+    const ares_decrypted = aes256.decrypt("yeet", ares_encrypted)
+    console.log(`ares_decrypted = ${ares_decrypted}`)
+    return res.status(500).json({})
   });
 
 module.exports = testRouter;
