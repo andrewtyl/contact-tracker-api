@@ -19,21 +19,17 @@ userRouter
 
     if (rawauth === undefined) {
       //no auth
-      return res
-        .status(403)
-        .json({
-          error: "Unauthorized",
-          errorMessage:
-            "No authorization was provided. Please include a Basic Authentication Header in your HTTP request.",
-        });
+      return res.status(403).json({
+        error: "Unauthorized",
+        errorMessage:
+          "No authorization was provided. Please include a Basic Authentication Header in your HTTP request.",
+      });
     } else if (!rawauth.startsWith("Basic")) {
-      return res
-        .status(404)
-        .json({
-          error: "Invalid Authorization Header",
-          errorMessage:
-            "Please use a Basic Authentication Header in your HTTP request.",
-        });
+      return res.status(404).json({
+        error: "Invalid Authorization Header",
+        errorMessage:
+          "Please use a Basic Authentication Header in your HTTP request.",
+      });
     } else {
       rawauth = rawauth.substr(6);
       rawauth = base64.decode(rawauth);
@@ -50,12 +46,10 @@ userRouter
         .then((kres) => {
           const userInfo = kres[0];
           if (userInfo === undefined) {
-            return res
-              .status(403)
-              .json({
-                error: "Unauthorized",
-                errorMessage: "The username or password is incorrect.",
-              });
+            return res.status(403).json({
+              error: "Unauthorized",
+              errorMessage: "The username or password is incorrect.",
+            });
           } else {
             const passRight = encrypt.comparePassword(
               userAuth.plainTextPass,
@@ -65,30 +59,26 @@ userRouter
             if (passRight) {
               const userkey =
                 (userAuth.plainTextPass, userInfo.user_salt) + "0000";
-              thisSessionKey = (encrypt.hashPassword(
+              thisSessionKey = encrypt.hashPassword(
                 adminKey + userkey,
                 "$2b$10$.Jryq1VpUrV5GE82OvmVTu"
-              ).hashedPass);
-              user_id = kres[0].user_id
+              ).hashedPass;
+              user_id = kres[0].user_id;
               next();
             } else {
-              return res
-                .status(403)
-                .json({
-                  error: "Unauthorized",
-                  errorMessage: "The username or password is incorrect.",
-                });
+              return res.status(403).json({
+                error: "Unauthorized",
+                errorMessage: "The username or password is incorrect.",
+              });
             }
           }
         })
         .catch((kres) => {
-          return res
-            .status(500)
-            .json({
-              error:
-                "Could not retrieve user info from database with knex. Please try again later or contact an admin.",
-              errorMessage: kres,
-            });
+          return res.status(500).json({
+            error:
+              "Could not retrieve user info from database with knex. Please try again later or contact an admin.",
+            errorMessage: kres,
+          });
         });
     }
   })
@@ -113,24 +103,20 @@ userRouter
     }
 
     if (typeof newPassword !== "string") {
-      return res
-        .status(400)
-        .json({
-          error: "Invalid password format",
-          errorMessage:
-            "Your new password should be a string between 8 and 24 characters.",
-        });
+      return res.status(400).json({
+        error: "Invalid password format",
+        errorMessage:
+          "Your new password should be a string between 8 and 24 characters.",
+      });
     } else if (
       newPassword.length > 24 ||
       (newPassword.length < 8 && createPassword === false)
     ) {
-      return res
-        .status(400)
-        .json({
-          error: "Invalid password format",
-          errorMessage:
-            "Your new password should be a string between 8 and 24 characters.",
-        });
+      return res.status(400).json({
+        error: "Invalid password format",
+        errorMessage:
+          "Your new password should be a string between 8 and 24 characters.",
+      });
     } else {
       let p1 = new Promise((resolve, reject) => {
         //only use if createPassword is true
@@ -162,39 +148,94 @@ userRouter
     return res.status(500).json("In Development");
   })
   .get("/contact", jsonBodyParser, (req, res, next) => {
-    return res.status(500).json("In Development");
+    let query = req.query;
+    if (query.contact_id !== null) {
+        query.contact_id = parseInt(query.contact_id)
+    }
+    let query_keys = Object.keys(query);
+    let query_values = Object.values(query);
+    const knexInstance = req.app.get("knexInstance");
+    knexInstance
+      .from("contact_list")
+      .where({ user_id: user_id })
+      .then((kres) => {
+        let contact = false;
+        for (let i = 0; i < kres.length; i++) {
+          Object.keys(kres[i]).forEach((key) => {
+            if (typeof kres[i][key] === "string") {
+              kres[i][key] = aes256.decrypt(thisSessionKey, kres[i][key]);
+            }
+          });
+          let currentContact = kres[i];
+          let currentContactKeys = Object.keys(currentContact);
+          let currentContactValues = Object.values(currentContact);
+          if (currentContactKeys.indexOf(query_keys[0]) !== -1) {
+            let matchFound = true;
+            for (let j = 0; j < query_keys.length; j++) {
+              let currentQueryKey = query_keys[j];
+              let index = currentContactKeys.indexOf(currentQueryKey);
+              if (index !== -1) {
+                if (query_values[j] !== currentContactValues[index]) {
+                  j = query_keys.length + 100;
+                  matchFound = false;
+                }
+              }
+            }
+            if (matchFound) {
+              contact = currentContact;
+              i = kres.length + 100;
+            }
+          }
+        }
+
+        if (contact !== false) {
+          return res.status(200).json(contact);
+        } else {
+          return res.status(404).json({
+            error: "Unable to Locate Contact",
+            errorMessage:
+              "The contact could not be located. Please alter your search parameters and try again. Note: Capitalization and formatting matters for your search query. Make sure you use the exact spelling, format, and capitalization as you did when you created/updated your contact.",
+          });
+        }
+      })
+      .catch((kres) => {
+        return res
+          .status(500)
+          .json({ error: "Knex connection error", errorMessage: kres });
+      });
   })
   .post("/contact", jsonBodyParser, (req, res, next) => {
-      console.log(req.body)
-      let keys = Object.keys(req.body)
-      let values = Object.values(req.body)
-      for (let i=0; i < values.length; i++) {
-          if (values[i].length > 200) {
-              return res.status(400).json({
-                  error: "Overfill error",
-                  errorMessage: `The ${keys[i]} value is over 200 characters. Please shorten it and then retry your request.`
-              })
-          }
+    let keys = Object.keys(req.body);
+    let values = Object.values(req.body);
+    for (let i = 0; i < values.length; i++) {
+      if (values[i].length > 200) {
+        return res.status(400).json({
+          error: "Overfill error",
+          errorMessage: `The ${keys[i]} value is over 200 characters. Please shorten it and then retry your request.`,
+        });
       }
-      let knexPost = req.body;
+    }
+    let knexPost = req.body;
 
-      Object.keys(knexPost).forEach(key => {
-          knexPost[key] = aes256.encrypt(thisSessionKey, knexPost[key])
+    Object.keys(knexPost).forEach((key) => {
+      knexPost[key] = aes256.encrypt(thisSessionKey, knexPost[key]);
+    });
+    knexPost.user_id = user_id;
+    if (knexPost.key) {
+      knexPost.key = aes256.encrypt(thisSessionKey, knexPost.key);
+    }
+    const knexInstance = req.app.get("knexInstance");
+    knexInstance("contact_list")
+      .insert(knexPost)
+      .then((kres) => {
+        return res.status(201).json(req.body);
       })
-      knexPost.user_id = user_id;
-      if (knexPost.key) {knexPost.key = aes256.encrypt(thisSessionKey, knexPost.key)}
-      const knexInstance = req.app.get("knexInstance");
-      knexInstance('contact_list').insert(knexPost).then( kres => {
-        return res.status(201).json(req.body)
-      }
-      ).catch(
-          kres => {
-              return res.status(500).json({
-                  error:"Knex Connection Failed",
-                  errorMessage: kres
-              })
-          }
-      )
+      .catch((kres) => {
+        return res.status(500).json({
+          error: "Knex Connection Failed",
+          errorMessage: kres,
+        });
+      });
   })
 
   .patch("/contact", jsonBodyParser, (req, res, next) => {

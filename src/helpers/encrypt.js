@@ -19,8 +19,6 @@ const encrypt = {
 
     comparePassword: (plainTextPass, hashedPass, salt) => {
         const hashedPass2 = encrypt.hashPassword(plainTextPass, salt).hashedPass
-        console.log(hashedPass2)
-        console.log(hashedPass)
         return (hashedPass === hashedPass2);
     },
 

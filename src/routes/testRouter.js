@@ -92,7 +92,7 @@ testRouter
     return res.status(500).json({});
   })
   .get("/aesTest", (req, res) => {
-    const ares_encrypted = aes256.encrypt("yeet", "SD2moxEAM0pI565nLgBCyr5FIbDKAMbT71eVohYzWVAIIXaMYUB4ca3Mt6CWpBcA2v6sBF0izy8erjp114ACj8WOarA1GgCpJLVMgSftPlOIHysfpZYnDfMsdwuSbQLNwT0Ui1PVZcMnldPJk8PEklokFvieQ6J0N63tJlFEW0CxwhBK3gbsasqRakvwYe3oUEZmVrU8")
+    const ares_encrypted = aes256.encrypt("yeet", "dab")
     console.log(`ares_encrypted = ${ares_encrypted}`)
     console.log(ares_encrypted.length)
     const ares_decrypted = aes256.decrypt("yeet", ares_encrypted)
