@@ -145,12 +145,43 @@ userRouter
     }
   })
   .get("/contacts", jsonBodyParser, (req, res, next) => {
-    return res.status(500).json("In Development");
-  })
+    const knexInstance = req.app.get("knexInstance");
+    knexInstance
+      .from("contact_list")
+      .where({ user_id: user_id })
+      .then((kres) => {
+        if (kres.length === 0) {
+            return res.status(404).json({
+              error: "Unable to Locate Contacts",
+              errorMessage:
+                "The contacts could not be located. Have you added any contacts yet? If yes, please try again later or contact an admin.",
+            });
+        }
+        let contacts = []
+        for (let i = 0; i < kres.length; i++) {
+            let currentContact = kres[i]
+            console.log(typeof currentContact)
+            Object.keys(currentContact).forEach((key) => {
+                if (typeof currentContact[key] === "string") {
+                    currentContact[key] = aes256.decrypt(thisSessionKey, currentContact[key]);
+                }})
+            contacts.push(currentContact)
+            }
+            contacts.sort((a, b) => {
+                return a.contact_id - b.contact_id
+            })
+        return res.status(200).json(contacts)
+    })})
   .get("/contact", jsonBodyParser, (req, res, next) => {
     let query = req.query;
+    if (query.length === 0) {
+        return res.status(404).json({
+            error: "No search parameter defined.",
+            errorMessage: "Please include search parameters in your HTTP request query. See the documentation for more information."
+        })
+    }
     if (query.contact_id !== null) {
-        query.contact_id = parseInt(query.contact_id)
+      query.contact_id = parseInt(query.contact_id);
     }
     let query_keys = Object.keys(query);
     let query_values = Object.values(query);
@@ -159,6 +190,13 @@ userRouter
       .from("contact_list")
       .where({ user_id: user_id })
       .then((kres) => {
+        if (kres.length === 0) {
+          return res.status(404).json({
+            error: "Unable to Locate Contact",
+            errorMessage:
+              "The contact could not be located. Please alter your search parameters and try again. Note: Capitalization and formatting matters for your search query. Make sure you use the exact spelling, format, and capitalization as you did when you created/updated your contact.",
+          });
+        }
         let contact = false;
         for (let i = 0; i < kres.length; i++) {
           Object.keys(kres[i]).forEach((key) => {
