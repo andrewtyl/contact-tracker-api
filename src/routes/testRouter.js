@@ -98,6 +98,14 @@ testRouter
     const ares_decrypted = aes256.decrypt("yeet", ares_encrypted)
     console.log(`ares_decrypted = ${ares_decrypted}`)
     return res.status(500).json({})
+  })
+  .get("/newPassword", (req, res) => {
+    let p1 = new Promise((resolve, reject) => {
+      encrypt.createPassword(resolve, reject);
+    })
+    p1.then(p1res => {
+      res.status(200).json(p1res)
+    })
   });
 
 module.exports = testRouter;
