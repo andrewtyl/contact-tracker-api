@@ -43,6 +43,7 @@ userRouter
         .from("user_list")
         .where({ user_username: userAuth.username })
         .select("user_salt", "user_password", "user_id")
+        .timeout(10000, { cancel: true })
         .then((kres) => {
           const userInfo = kres[0];
           if (userInfo === undefined) {
@@ -91,6 +92,7 @@ userRouter
     knexInstance
       .from("contact_list")
       .where({ user_id: user_id })
+      .timeout(10000, { cancel: true })
       .then((kres) => {
         if (kres.length === 0) {
           return res.status(404).json({
@@ -117,6 +119,11 @@ userRouter
           return a.contact_id - b.contact_id;
         });
         return res.status(200).json(contacts);
+      }).catch(kres => {
+        return res.status(500).json({
+          error: "knex connection failed",
+          errorMessage: kres
+        })
       });
   })
   .get("/contact", jsonBodyParser, (req, res, next) => {
@@ -137,6 +144,7 @@ userRouter
     knexInstance
       .from("contact_list")
       .where({ user_id: user_id })
+      .timeout(10000, { cancel: true })
       .then((kres) => {
         if (kres.length === 0) {
           return res.status(404).json({
@@ -213,6 +221,7 @@ userRouter
     const knexInstance = req.app.get("knexInstance");
     knexInstance("contact_list")
       .insert(knexPost)
+      .timeout(10000, { cancel: true })
       .then((kres) => {
         return res.status(201).json(req.body);
       })
@@ -263,7 +272,7 @@ userRouter
       toPatch[key] = aes256.encrypt(thisSessionKey, toPatch[key]);
     });
     const knexInstance = req.app.get("knexInstance")
-    knexInstance.from('contact_list').where({contact_id: contact_id, user_id: user_id}).select('contact_id', 'user_id').then((kres1) => {
+    knexInstance.from('contact_list').where({contact_id: contact_id, user_id: user_id}).select('contact_id', 'user_id').timeout(10000, { cancel: true }).then((kres1) => {
       if (kres1[0] === undefined) {
         return res.status(404).json({
           error: "Unable to locate contact",

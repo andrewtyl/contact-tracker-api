@@ -38,6 +38,7 @@ adminRouter
         .from("user_list")
         .where({ user_username: userAuth.username })
         .select("user_admin", "user_salt", "user_password")
+        .timeout(10000, { cancel: true })
         .then((kres) => {
           const userInfo = kres[0];
           if (userInfo === undefined) {
@@ -72,6 +73,11 @@ adminRouter
                   "You are not authorized for /admin/* privileges. Please contact another admin if this is a mistake.",
               });
           }
+        }).catch(kres => {
+          return res.status(500).json({
+            error: "knex connection failed",
+            errorMessage: kres
+          })
         });
     }
   })
@@ -84,7 +90,7 @@ adminRouter
     knexInstance
       .from("user_list")
       .select("user_id", "user_username", "user_admin")
-      .timeout(1000, { cancel: true })
+      .timeout(10000, { cancel: true })
       .then((knexRes) => {
         return res.status(200).json(knexRes);
       })
@@ -122,7 +128,7 @@ adminRouter
         .from("user_list")
         .where(knexReq)
         .select("user_id", "user_username", "user_admin")
-        .timeout(1000, { cancel: true })
+        .timeout(10000, { cancel: true })
         .then((knexRes) => {
           if (knexRes[0] !== undefined) {
             return res.status(200).json(knexRes);
@@ -178,6 +184,7 @@ adminRouter
               user_salt: salt,
               user_admin: false,
             })
+            .timeout(10000, { cancel: true })
             .then(() => {
               return res
                 .status(201)

@@ -73,7 +73,7 @@ testRouter
     const knexInstance = req.app.get("knexInstance");
     knexInstance
       .from("knex_test_table")
-      .timeout(1000, { cancel: true })
+      .timeout(10000, { cancel: true })
       .then((knexRes) => {
         return res.status(200).json("Knex connection working properly");
       })
