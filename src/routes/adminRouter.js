@@ -32,7 +32,6 @@ adminRouter
             rawauth = rawauth.substr(6)
             rawauth = base64.decode(rawauth)
             const userAuth = { username: rawauth.split(':')[0], plainTextPass: rawauth.split(":")[1] }
-            console.log(userAuth)
             const knexInstance = req.app.get('knexInstance')
             knexInstance.from('user_list').where({ user_username: userAuth.username }).select("user_admin", "user_salt", "user_password").then(kres => {
                 const userInfo = kres[0]

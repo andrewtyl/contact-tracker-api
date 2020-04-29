@@ -72,7 +72,11 @@ CREATE TABLE contact_list (
 	CONSTRAINT contact_list_pk PRIMARY KEY (contact_id),
 	CONSTRAINT contact_list_fk FOREIGN KEY (user_id) REFERENCES public.user_list(user_id)
 );
+/* If you are able, I'd reccomend making a specific user for knex to connect with, and granting it access to all the tables. */
+/* This may not be possible on shared databases/psql servers, like Heroku Postgres Hobby. But if you do, uncomment the following commands. */
 
+/*
 GRANT ALL ON TABLE contact_list TO knex;
 GRANT ALL ON TABLE knex_test_table TO knex;
 GRANT ALL ON TABLE user_list TO knex;
+*/
