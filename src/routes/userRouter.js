@@ -198,6 +198,44 @@ userRouter
           .json({ error: "Knex connection error", errorMessage: kres });
       });
   })
+  .get("/contact/:contact_id", jsonBodyParser, (req, res, next) => {
+    let contact_id = req.params.contact_id;
+    contact_id = parseInt(contact_id);
+    if (typeof contact_id !== "number" || isNaN(contact_id)) {
+      return res.status(404).json({
+        error: "Syntax error",
+        errorMessage:
+          "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
+      });
+    }
+    if (contact_id <= 0) {
+      return res.status(404).json({
+        error: "Syntax error",
+        errorMessage:
+        "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
+      });
+    }
+    const knexInstance = req.app.get("knexInstance");
+    knexInstance.from('contact_list').where({user_id: user_id, contact_id: contact_id}).timeout(10000, {cancel: true}).then(kres => {
+      if (kres[0] === undefined) {
+        return res.status(404).json({
+          error: "Unable to locate contact",
+          errorMessage: "Contact could not be located. Ensure you are using the correct contact ID and account."
+        })
+      }
+      else {
+        let contact = kres[0]
+        let contactKeys = Object.keys(contact)
+        contactKeys.forEach((key) => {
+          if (typeof contact[key] === "string") {
+            contact[key] = aes256.decrypt(thisSessionKey, contact[key])
+          }
+        })
+        return res.status(200).json(contact) 
+      }
+    })
+
+  })
   .post("/contact", jsonBodyParser, (req, res, next) => {
     let keys = Object.keys(req.body);
     let values = Object.values(req.body);
@@ -243,14 +281,14 @@ userRouter
       return res.status(404).json({
         error: "Syntax error",
         errorMessage:
-          "Please ensure you include the 'contact_id' of the contact you want to update in your request body.",
+          "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
       });
     }
     if (contact_id <= 0) {
       return res.status(404).json({
         error: "Syntax error",
         errorMessage:
-          "Please ensure you include the 'contact_id' of the contact you want to update in your request body.",
+        "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
       });
     }
     if (keys.indexOf(contact_id) !== -1) {
