@@ -1,6 +1,26 @@
 # Contact Tracker (API) [![Build Status](https://travis-ci.com/andrewtyl/contact-tracker-api.svg?branch=master)](https://travis-ci.com/andrewtyl/contact-tracker-api)
 ## Andrew Jessen-Tyler
 
+### Overview
+This Express App is used for storing contacts securely in a PostgreSQL server. I made this app just as a simple skills demonstration for my portfolio.
+
+It uses AES256 encryption to store all the contact information, and bases it's key off of the user's password so even admins can't see them. Due to this encryption, it does trade off with efficiency. But due to the small scale nature of this app, this doesn't seem to be much of an issue. The Express App also uses HTTPS and will enforce connections to use it.
+
+If you want to try this yourself, you will need an admin to manually register you. Contact ajessen@ajessen.com if you are interested. You can still try the "testing" routes at https://contact-api.ajessen.com/
+
+
+### Paths
+
+
+
+### Future Updates
+
+
+
+### Changelog
+- 4/29/2020 - V1.0 Released. The app is now functional for use.
+
+
 ###### License
 MIT License
 
