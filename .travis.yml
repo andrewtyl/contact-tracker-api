@@ -1,10 +1,10 @@
 language: node_js
 node_js: 10
 deploy:
+  provider: heroku
   app: contact-tracker-api
   on:
     branch: master
-    provider: heroku
   api_key:
     secure: uFbeRvzm9b3YeOsS86FwZa7gyxms5Iymeg1tj5UVHQmqGtKFTds01F/RGTxeS8cQd3Nv0rQdyrPK8iLnZvAk3e2L270TMgK6PfSFOvpEfMuERXSSMMKrnJ8182g7sGaY4Gi6S1JNbsf/ks1NuGWZr/OeiMDNNx2o1FIl4xYVc9C6GbGtP7Oszb7yk8jkUYW7wfhOodr4uFBdEOmgl1pQO12MnnT4R9nooU+23sPvblLaFf6s4b13zH8oEAHNHaWp656LMLoXYR/IAHfN605D6YknOVXAsVcw2a2DsfDnBsX+sINeiNf3v9XGMoMYe08+qUsTBevgMmfwHS6GdtFpRi75BXvovNogbrIHcta2N4stXCpe6uTHC0ESMjDjlCv6eaaDHIRF+n3IOQiGjUx6Yzwy5oiWGiwZV/Wg7clamhuj+w7albZxbTH0CzpZsq4KLPnPdyD5++Ws3RKeCv9IP6TFEcpKCpfY9ukSye5uT+xhYZG57VhmkCJfdcVY5df40yxL0Cl+RLw37J1rnecpIV4Oixu1b01DQLO0a3RiKEXO3davIeqZXn3EQyaNvRYA5FpyQfSvy+4eQ9DnoDyYZLzBlV6oW6LNoYfDhdnCecE1x7mrurgufuIQrMWT44YmvS38OLdwXiZPSdYv3+O8L95CYjzP8CJqZjfKmthS900=
 notifications:
