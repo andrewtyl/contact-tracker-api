@@ -86,99 +86,47 @@ userRouter
     //methods description and syntax
     return res.status(500).json("In Development");
   })
-  .patch("/changePassword", jsonBodyParser, (req, res, next) => {
-    //if no new password is provided, generate one
-    let createPassword = null;
-    let newPassword = req.body.newPassword;
-    if (
-      newPassword === undefined ||
-      newPassword === null ||
-      newPassword === "" ||
-      !newPassword
-    ) {
-      createPassword = true;
-      newPassword = "";
-    } else {
-      createPassword = false;
-    }
-
-    if (typeof newPassword !== "string") {
-      return res.status(400).json({
-        error: "Invalid password format",
-        errorMessage:
-          "Your new password should be a string between 8 and 24 characters.",
-      });
-    } else if (
-      newPassword.length > 24 ||
-      (newPassword.length < 8 && createPassword === false)
-    ) {
-      return res.status(400).json({
-        error: "Invalid password format",
-        errorMessage:
-          "Your new password should be a string between 8 and 24 characters.",
-      });
-    } else {
-      let p1 = new Promise((resolve, reject) => {
-        //only use if createPassword is true
-        encrypt.createPassword(resolve, reject);
-      });
-      let p2 = new Promise((resolve, reject) => {
-        const salt = encrypt.genSalt();
-        let thisresponse = encrypt.hashPassword(newPassword, salt);
-        resolve({ hashedPass: thisresponse.hashedPass, salt });
-      });
-
-      let updatePassword = (newPlainTextPass, newHashedPass, newSalt) => {};
-      if (createPassword) {
-        p1.then((p1res) => {
-          console.log("p1res inc");
-          console.log(p1res);
-        });
-      } else {
-        p2.then((p2res) => {
-          console.log("p2res inc");
-          console.log(p2res);
-        });
-      }
-
-      return res.status(500).json("In Development");
-    }
-  })
-  .get("/contacts", jsonBodyParser, (req, res, next) => {
+   .get("/contacts", jsonBodyParser, (req, res, next) => {
     const knexInstance = req.app.get("knexInstance");
     knexInstance
       .from("contact_list")
       .where({ user_id: user_id })
       .then((kres) => {
         if (kres.length === 0) {
-            return res.status(404).json({
-              error: "Unable to Locate Contacts",
-              errorMessage:
-                "The contacts could not be located. Have you added any contacts yet? If yes, please try again later or contact an admin.",
-            });
+          return res.status(404).json({
+            error: "Unable to Locate Contacts",
+            errorMessage:
+              "The contacts could not be located. Have you added any contacts yet? If yes, please try again later or contact an admin.",
+          });
         }
-        let contacts = []
+        let contacts = [];
         for (let i = 0; i < kres.length; i++) {
-            let currentContact = kres[i]
-            console.log(typeof currentContact)
-            Object.keys(currentContact).forEach((key) => {
-                if (typeof currentContact[key] === "string") {
-                    currentContact[key] = aes256.decrypt(thisSessionKey, currentContact[key]);
-                }})
-            contacts.push(currentContact)
+          let currentContact = kres[i];
+          console.log(typeof currentContact);
+          Object.keys(currentContact).forEach((key) => {
+            if (typeof currentContact[key] === "string") {
+              currentContact[key] = aes256.decrypt(
+                thisSessionKey,
+                currentContact[key]
+              );
             }
-            contacts.sort((a, b) => {
-                return a.contact_id - b.contact_id
-            })
-        return res.status(200).json(contacts)
-    })})
+          });
+          contacts.push(currentContact);
+        }
+        contacts.sort((a, b) => {
+          return a.contact_id - b.contact_id;
+        });
+        return res.status(200).json(contacts);
+      });
+  })
   .get("/contact", jsonBodyParser, (req, res, next) => {
     let query = req.query;
     if (query.length === 0) {
-        return res.status(404).json({
-            error: "No search parameter defined.",
-            errorMessage: "Please include search parameters in your HTTP request query. See the documentation for more information."
-        })
+      return res.status(404).json({
+        error: "No search parameter defined.",
+        errorMessage:
+          "Please include search parameters in your HTTP request query. See the documentation for more information.",
+      });
     }
     if (query.contact_id !== null) {
       query.contact_id = parseInt(query.contact_id);
