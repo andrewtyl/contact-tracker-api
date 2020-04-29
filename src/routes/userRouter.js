@@ -86,7 +86,7 @@ userRouter
     //methods description and syntax
     return res.status(500).json("In Development");
   })
-   .get("/contacts", jsonBodyParser, (req, res, next) => {
+  .get("/contacts", jsonBodyParser, (req, res, next) => {
     const knexInstance = req.app.get("knexInstance");
     knexInstance
       .from("contact_list")
@@ -224,20 +224,65 @@ userRouter
       });
   })
 
-  .patch("/contact", jsonBodyParser, (req, res, next) => {
-    return res.status(500).json("In Development");
+  .patch("/contact/:contact_id", jsonBodyParser, (req, res, next) => {
+    let contact_id = req.params.contact_id;
+    contact_id = parseInt(contact_id);
+    let toPatch = req.body;
+    let keys = Object.keys(req.body);
+    let values = Object.values(req.body);
+    if (typeof contact_id !== "number" || isNaN(contact_id)) {
+      return res.status(404).json({
+        error: "Syntax error",
+        errorMessage:
+          "Please ensure you include the 'contact_id' of the contact you want to update in your request body.",
+      });
+    }
+    if (contact_id <= 0) {
+      return res.status(404).json({
+        error: "Syntax error",
+        errorMessage:
+          "Please ensure you include the 'contact_id' of the contact you want to update in your request body.",
+      });
+    }
+    if (keys.indexOf(contact_id) !== -1) {
+      return res.status(404).json({
+        error: "Syntax error",
+        errorMessage: "Please only include the 'contact_id' in your request query/parameters, not the body."
+      })
+    }
+    for (let i = 0; i < values.length; i++) {
+      if (values[i].length > 200) {
+        return res.status(400).json({
+          error: "Overfill error",
+          errorMessage: `The ${keys[i]} value is over 200 characters. Please shorten it and then retry your request.`,
+        });
+      }
+    }
+
+    Object.keys(toPatch).forEach((key) => {
+      toPatch[key] = aes256.encrypt(thisSessionKey, toPatch[key]);
+    });
+    const knexInstance = req.app.get("knexInstance")
+    knexInstance.from('contact_list').where({contact_id: contact_id, user_id: user_id}).select('contact_id', 'user_id').then((kres1) => {
+      if (kres1[0] === undefined) {
+        return res.status(404).json({
+          error: "Unable to locate contact",
+          errorMessage: "Contact could not be located. Ensure you are using the correct contact ID and account."
+        })
+      }
+      else {
+        knexInstance('contact_list').where({user_id: user_id, contact_id: contact_id}).update(toPatch).then((kres2) => {
+          res.status(200).json({
+            message: "Your contact was successfully updated."
+          })
+        }).catch((kres2) => {
+          return res.status(500).json({
+            error: "Knex Connection Error. Could not update contact info",
+            errorMessage: kres2
+          })
+        })      
+      }
+    })
   })
-  .get("/backupContacts", jsonBodyParser, (req, res, next) => {
-    return res.status(500).json("In Development");
-  })
-  .post("/backupContacts", jsonBodyParser, (req, res, next) => {
-    return res.status(500).json("In Development");
-  });
 
 module.exports = userRouter;
-
-//Use AES 256 encryption to encrypt/decrypt the contact info.
-
-//const plaintext = contact info;
-//const encrypted = aes256.encrypt(thisSessionKey, plaintext);
-//const decrypted = aes256.decrypt(thisSessionKey, encrypted);
