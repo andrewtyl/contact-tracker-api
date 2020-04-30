@@ -1,16 +1,10 @@
 {
   "name": "contact-tracker-api",
   "description": "An API for storing contacts in a Postgres database",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "author": "Andrew Jessen-Tyler",
   "homepage": "https://github.com/andrewtyl/express-boilerplate",
   "license": "MIT",
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://opensource.org/licenses/MIT"
-    }
-  ],
   "engines": {
     "node": "10.16.3",
     "npm": "6.14.4"
@@ -20,7 +14,8 @@
     "url": "https://github.com/andrewtyl/express-boilerplate.git"
   },
   "keywords": [
-    "express"
+    "express",
+    "postgresql"
   ],
   "main": "src/server.js",
   "scripts": {
