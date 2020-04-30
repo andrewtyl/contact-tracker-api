@@ -82,7 +82,15 @@ adminRouter
     }
   })
   .get("/", jsonBodyParser, (req, res, next) => {
-    return res.status(501).json("In Development");
+    return res.status(200).json({
+      message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+      paths: [
+        "GET /admin/ - Responds with a detailed message, including all admin routes and their usage.",
+            "GET /admin/users - Responds with a list of all users, including their user id, username, and if the user is an admin or not.",
+            "GET /admin/user - Similar to the /admin/users endpoint, but this one searches all users and returns with a single user. Requires the HTTP Request Query to include 'user_id', 'user_username', or both.",
+            "POST /admin/user - Creates a new user. It also generates a password for them as well. Requires 'username' in the JSON request body, which should have a value of a string."
+      ]
+    });
   })
 
   .get("/users", jsonBodyParser, (req, res, next) => {
