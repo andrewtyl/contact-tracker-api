@@ -84,8 +84,17 @@ userRouter
     }
   })
   .get("/", jsonBodyParser, (req, res, next) => {
-    //methods description and syntax
-    return res.status(500).json("In Development");
+    return res.status(200).json({
+      message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+      paths: [
+        "GET /user/ - Responds with a detailed message, including all user routes and their usage.",
+        "GET /user/contacts - Responds with the all contacts owned by the user.",
+        "GET /user/contact - Similar to the /user/contacts endpoint, but this one searches all users and returns with a single contact. Requires the HTTP Request Query to include one or more keys or values matching the contact you are trying to search for. See POST /user/contact in the README for more information.",
+        "GET /user/contact/:contact_id - Just like the /user/contact endpoint, but this one is used if you already know the contact ID. So if you are searching for contact id '7', you would make a GET request to /user/contact/7 . No query or body is required with this endpoint.",
+        "POST /user/contact - Posts a new contact to the database under the logged in user. Requires at least one contact storage key and value in the JSON request body. Accepted contact storage fields listed in the README (and they all use string values).",
+        "PATCH /user/contact/:contact_id - Allows you to update contact information. Requires one or more of the fields from 'POST /user/contact' in the JSON request body. Also requires the contact ID in the url/parameters. For example, if you are trying to access contact 7, make your request to /contact/7 ."
+      ]
+    });
   })
   .get("/contacts", jsonBodyParser, (req, res, next) => {
     const knexInstance = req.app.get("knexInstance");
