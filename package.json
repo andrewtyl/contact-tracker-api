@@ -1,7 +1,7 @@
 {
   "name": "contact-tracker-api",
   "description": "An API for storing contacts in a Postgres database",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "Andrew Jessen-Tyler",
   "homepage": "https://github.com/andrewtyl/express-boilerplate",
   "license": "MIT",

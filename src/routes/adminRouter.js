@@ -84,6 +84,7 @@ adminRouter
   .get("/", jsonBodyParser, (req, res, next) => {
     return res.status(200).json({
       message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+      source_code: "https://github.com/andrewtyl/contact-tracker-api",
       paths: [
         "GET /admin/ - Responds with a detailed message, including all admin routes and their usage.",
             "GET /admin/users - Responds with a list of all users, including their user id, username, and if the user is an admin or not.",

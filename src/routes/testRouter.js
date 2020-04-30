@@ -12,6 +12,7 @@ testRouter
   .get("/", (req, res) => {
     return res.status(200).json({
       message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+      source_code: "https://github.com/andrewtyl/contact-tracker-api",
       paths: [
         "GET /test/ - Responds with a detailed message, including all test routes and their usage.",
             "GET /test/saltTest - A remnant of my testing for other routes. You can send a request here to test out the bcrypt hash + custom salting method. I recommend reading the source code for this path. (./src/routes/testRouter.js)",

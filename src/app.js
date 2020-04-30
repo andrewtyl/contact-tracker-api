@@ -45,6 +45,7 @@ app.use('/test', testRouter)
 app.get('/', (req, res) => {
     res.status(200).json({
         message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+        source_code: "https://github.com/andrewtyl/contact-tracker-api",
         paths: [
             "GET / - Responds with a detailed message, including all routes and their usage.",
             "GET /test/ - Responds with a detailed message, including all test routes and their usage.",
