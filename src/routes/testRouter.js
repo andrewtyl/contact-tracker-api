@@ -10,7 +10,17 @@ const aes256 = require('aes256');
 
 testRouter
   .get("/", (req, res) => {
-    return res.status(500).json("In Development");
+    return res.status(200).json({
+      message: 'Welcome to the "Contact Tracker" API app by AJessen. Please refer to the documentation at https://github.com/andrewtyl/contact-tracker-api/blob/master/README.md for more details.',
+      paths: [
+        "GET /test/ - Responds with a detailed message, including all test routes and their usage.",
+            "GET /test/saltTest - A remnant of my testing for other routes. You can send a request here to test out the bcrypt hash + custom salting method. I recommend reading the source code for this path. (./src/routes/testRouter.js)",
+            "GET /test/genPassword - Generates a random password for use with the program. The response includes the plain text password, the hashed password, and the salt. Everything an admin would need to change a password for an existing user. I mainly use this to change the password for the super user in the database.",
+            "GET /test/knexTest - Triggers a connection test between the API and the PostgreSQL server.",
+            "GET /test/genSalt - Sometimes I needed to have a salt pregenerated (so I use the same salt each time) in the hard code, such as for the 'thisSessionKey' used to encrypt user's contacts. So that's what this is for. It simply uses bcrypt to generate a salt compatible with it.",
+            "GET /test/aesTest - Yet another remnant of my testing for other routes. Just shows how aes256 encryption works. It did help show me that the encrypting the same text and key still makes a different encrypted string each time, but will always be decryptable with the right key regardless."
+      ]
+    });
   })
   .get("/hashTest", (req, res) => {
     const password = "defaultPassword1!";
