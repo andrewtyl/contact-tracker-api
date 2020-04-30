@@ -74,9 +74,9 @@ testRouter
       encrypt.createPassword(resolve, reject);
     });
     p1.then((encrypt_res) => {
-      console.log(encrypt_res);
-      console.log(typeof encrypt_res);
-      res.status(500).json(encrypt_res);
+      res.status(200).json(encrypt_res);
+    }).catch(encrypt_res => {
+      res.status(500).json(encrypt_res)
     });
   })
 
@@ -101,10 +101,10 @@ testRouter
     return res.status(200).json(genSalt);
   })
   .get("/aesTest", (req, res) => {
-    const ares_encrypted = aes256.encrypt("yeet", "dab")
-    const ares_decrypted = aes256.decrypt("yeet", ares_encrypted)
+    const ares_encrypted = aes256.encrypt("dab", "yeet")
+    const ares_decrypted = aes256.decrypt("dab", ares_encrypted)
     return res.status(200).json({
-      to_be_encrypted: "yeet", encrypttion_key: "dab", ares_encrypted, ares_decrypted
+      to_be_encrypted: "yeet", encryption_key: "dab", ares_encrypted, ares_decrypted
     })
   })
 
