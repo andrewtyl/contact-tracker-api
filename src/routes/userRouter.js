@@ -238,6 +238,12 @@ userRouter
   })
   .post("/contact", jsonBodyParser, (req, res, next) => {
     let keys = Object.keys(req.body);
+    if (keys.length === 0) {
+      return res.status(400).json({
+        error: "no fields in request body",
+        errorMessage: "Please ensure you have fields like 'contact_first_name' in your request body. See the documentation for more details."
+      })
+    }
     let values = Object.values(req.body);
     for (let i = 0; i < values.length; i++) {
       if (values[i].length > 200) {
@@ -278,21 +284,27 @@ userRouter
     let keys = Object.keys(req.body);
     let values = Object.values(req.body);
     if (typeof contact_id !== "number" || isNaN(contact_id)) {
-      return res.status(404).json({
+      return res.status(400).json({
         error: "Syntax error",
         errorMessage:
           "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
       });
     }
     if (contact_id <= 0) {
-      return res.status(404).json({
+      return res.status(400).json({
         error: "Syntax error",
         errorMessage:
         "Please ensure you include the 'contact_id' of the contact you want to update in your request parameters/url. For example, if you are trying to access contact 7, make your request to /contact/7",
       });
     }
+    if (keys.length === 0) {
+      return res.status(400).json({
+        error: "Syntax error",
+        errorMessage: "Please ensure you have fields like 'contact_first_name' in your request body. See the documentation for more details."
+      })
+    }
     if (keys.indexOf(contact_id) !== -1) {
-      return res.status(404).json({
+      return res.status(400).json({
         error: "Syntax error",
         errorMessage: "Please only include the 'contact_id' in your request query/parameters, not the body."
       })

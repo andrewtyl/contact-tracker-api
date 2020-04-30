@@ -103,7 +103,7 @@ adminRouter
   })
 
   .get("/user", jsonBodyParser, (req, res, next) => {
-    let user_id = req.query.user_id;
+    const user_id = req.query.user_id;
     const user_username = req.query.user_username;
 
     if (user_id === undefined && user_username === undefined) {

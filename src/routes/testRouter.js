@@ -87,17 +87,14 @@ testRouter
 
   .get("/genSalt", (req, res) => {
     let genSalt = encrypt.genSalt();
-    console.log(genSalt);
-    console.log(typeof genSalt);
-    return res.status(500).json({});
+    return res.status(200).json(genSalt);
   })
   .get("/aesTest", (req, res) => {
     const ares_encrypted = aes256.encrypt("yeet", "dab")
-    console.log(`ares_encrypted = ${ares_encrypted}`)
-    console.log(ares_encrypted.length)
     const ares_decrypted = aes256.decrypt("yeet", ares_encrypted)
-    console.log(`ares_decrypted = ${ares_decrypted}`)
-    return res.status(500).json({})
+    return res.status(200).json({
+      to_be_encrypted: "yeet", encrypttion_key: "dab", ares_encrypted, ares_decrypted
+    })
   })
 
 module.exports = testRouter;
